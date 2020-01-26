@@ -6,10 +6,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import chat.room.request.MessagePostRequest;
@@ -58,11 +58,11 @@ public class ChatController {
 	        @ApiResponse(code = 403, message = "Accessing the list of messages is forbidden"),
 	        @ApiResponse(code = 404, message = "The list you were trying to reach is not found")
 	    })
-    @GetMapping("/incoming-messages/user/{user}")
+    @GetMapping("/incoming-messages")
     public ResponseEntity<IncomingGetResponse> getIncomingMessages(
-			@PathVariable(name = "user") @ApiParam(value = "Receiver name for the messages", required = true) String user)
+    		@RequestParam @ApiParam(value = "Receiver name for the messages", required = true) String receiver)
     {
-		IncomingGetResponse incomingGetResponse = this.chatService.getIncomingMessages(user);
+		IncomingGetResponse incomingGetResponse = this.chatService.getIncomingMessages(receiver);
         if (incomingGetResponse != null) {
             return ResponseEntity.status(HttpStatus.OK).body(incomingGetResponse);
 		}
@@ -80,11 +80,11 @@ public class ChatController {
 	        @ApiResponse(code = 403, message = "Accessing the list of messages is forbidden"),
 	        @ApiResponse(code = 404, message = "The list you were trying to reach is not found")
 	    })
-    @GetMapping("/outcoming-messages/user/{user}")
+    @GetMapping("/outcoming-messages")
     public ResponseEntity<OutcomingGetResponse> getOutcomingMessages(
-			@PathVariable(name = "user") @ApiParam(value = "Sender name for the messages", required = true) String user)
+			@RequestParam @ApiParam(value = "Sender name for the messages", required = true) String sender)
     {
-		OutcomingGetResponse outcomingGetResponse = this.chatService.getOutcomingMessages(user);
+		OutcomingGetResponse outcomingGetResponse = this.chatService.getOutcomingMessages(sender);
 		if (outcomingGetResponse != null) {
 	        return ResponseEntity.status(HttpStatus.OK).body(outcomingGetResponse);
 		}
@@ -102,9 +102,9 @@ public class ChatController {
 	        @ApiResponse(code = 403, message = "Accessing the message is forbidden"),
 	        @ApiResponse(code = 404, message = "The message you were trying to reach is not found")
 	    })
-    @GetMapping("/message/subject/{subject}")
+    @GetMapping("/message-details")
     public ResponseEntity<MessageGetResponse> getMessageDetails(
-			@PathVariable(name = "subject") @ApiParam(value = "Subject of the message", required = true) String subject)
+			@RequestParam @ApiParam(value = "Subject of the message", required = true) String subject)
     {
 		MessageGetResponse messageGetResponse = this.chatService.getMessageDetails(subject);
 		if (messageGetResponse != null) {
