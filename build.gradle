@@ -1,5 +1,6 @@
 buildscript {
-    repositories {
+    repositories {  
+		mavenCentral()      
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.2.RELEASE")
