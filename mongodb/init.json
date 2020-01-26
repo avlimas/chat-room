@@ -1,6 +1,18 @@
 [
-	{ "name":"Friejtes", "email":"frietjes@gmail.com" },
-	{ "name":"Carolus-Beer", "email":"carolus-beer@gmail.com" },
-	{ "name":"Mosselen", "email":"mosselen@gmail.com" },
-	{ "name":"Stoofvlees", "email":"stoofvlees@gmail.com" }
+	{ 
+		"sender" : "belgium", 
+		"receiver" : "germany", 
+		"subject" : "First message", 
+		"content" : "Content of first message", 
+		"sentDate" : ISODate("2020-01-25T12:32:51.931Z"), 
+		"_class" : "chat.room.model.MessageEntity" 
+	},
+	{ 
+		"sender" : "germany", 
+		"receiver" : "belgium", 
+		"subject" : "Second message", 
+		"content" : "Content of second message", 
+		"sentDate" : ISODate("2020-01-25T12:34:51.931Z"), 
+		"_class" : "chat.room.model.MessageEntity" 
+	}
 ]
