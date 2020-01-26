@@ -2,7 +2,6 @@ package service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,15 +59,15 @@ public class ChatServiceImplTestIT {
 		
 		MessageGetResponse actualMessageGetResponse = this.chatService.getMessageDetails(subject);
 		
-		assertEquals(getExpectedMessageGetResponse(), actualMessageGetResponse);
+		assertEquals(getExpectedMessageGetResponse(actualMessageGetResponse.getMessageId()), actualMessageGetResponse);
 	}
 	
 	@Test
     @DisplayName("Testing - Send a message")
     @Order(4)
     void sendMessage() {
-		String currentTime = LocalDate.now().toString();
-		String subject = "Integration Subject" + currentTime; 
+		String currentTime = LocalDateTime.now().toString();
+		String subject = "Integration Subject - " + currentTime; 
 		MessagePostRequest messagePostRequest = getMessagePostRequest(subject, currentTime);
 		String expectedSender = messagePostRequest.getSender();
 		String expectedReceiver = messagePostRequest.getReceiver();
@@ -83,14 +82,14 @@ public class ChatServiceImplTestIT {
 	}
 	
 	private MessagePostRequest getMessagePostRequest(String subject, String currentTime) {
-		return MessagePostRequest.builder().sender("Test_Instance - ")
+		return MessagePostRequest.builder().sender("Test_Instance")
 				.receiver("Integration").subject(subject)
-				.content("Content of integration subject, Date" + currentTime).build();
+				.content("Content of integration subject, Date - " + currentTime).build();
 	}
 	
-	private MessageGetResponse getExpectedMessageGetResponse() {
+	private MessageGetResponse getExpectedMessageGetResponse(String messageId) {
 		return MessageGetResponse.builder()
-				.messageId("5e2ad4b0acd2f7239b800cd4")
+				.messageId(messageId)
 				.sender("belgium")
 				.receiver("germany")
 				.content("Content of first message")
