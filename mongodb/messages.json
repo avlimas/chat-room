@@ -1,0 +1,10 @@
+[
+	{ 
+		"sender" : "france", 
+		"receiver" : "denmark", 
+		"subject" : "Test message", 
+		"content" : "Content of test message", 
+		"sentDate" : ISODate("2020-01-25T12:32:51.931Z"), 
+		"_class" : "chat.room.model.MessageEntity" 
+	}
+]
