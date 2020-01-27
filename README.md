@@ -19,6 +19,14 @@ cd <path-to-your-chat-room-folder>/build/libs
 java -jar chat-room-1.0.0.jar
 ``` 
 You can connect to the application by these endpoints below. By default, the hostname is locahost and port is 8080.
+The default setting for the mongodb is:
+ - hostname:localhost
+ - port: 27017
+ - database_name: chat_db
+ 
+## Prequisites
+
+MongoDB, JDK8 are required but Docker for Windows/ Docker Toolbox is optional.
 
 ## REST Endpoints
 There are 6 endpoints in this application:
@@ -29,5 +37,5 @@ There are 6 endpoints in this application:
 - Get incoming messages of a user: http://localhost:8080/api/v1/chat/incoming-messages?receiver={receiver}
 - Get outcoming messages by a user: http://localhost:8080/api/v1/chat/outcoming-messages?sender={sender}
 - Get message details: http://localhost:8080/api/v1/chat/message-details?subject={subject}
-- Estimation of messages per day: 
-- Estimation of messages per week:
+- Estimation of messages per day: http://localhost:8080/api/v1/chat/estimate-messages-today
+- Estimation of messages per week:http://localhost:8080/api/v1/chat/estimate-messages-weekly
