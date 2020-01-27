@@ -1,6 +1,8 @@
 package chat.room.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -12,9 +14,11 @@ import chat.room.mapper.MessageMapper;
 import chat.room.model.MessageEntity;
 import chat.room.repository.MessageRepository;
 import chat.room.request.MessagePostRequest;
+import chat.room.response.DayEstimationGetResponse;
 import chat.room.response.IncomingGetResponse;
 import chat.room.response.MessageGetResponse;
 import chat.room.response.OutcomingGetResponse;
+import chat.room.response.WeekEstimationGetResponse;
 import chat.room.response.object.IncomingMessage;
 import chat.room.response.object.OutcomingMessage;
 import chat.room.service.ChatService;
@@ -32,11 +36,9 @@ public class ChatServiceImpl implements ChatService {
 	public void sendMessage(MessagePostRequest messagePostRequest) 
 	{
 		MessageEntity messageEntity = messageMapper.messagePostRequestToMessageEntity(messagePostRequest);
-		if (messageEntity != null) {
-			LocalDateTime currentTime = LocalDateTime.now();
-			messageEntity.setSentDate(currentTime);
-			this.messageRepository.save(messageEntity);
-		}
+		LocalDateTime currentTime = LocalDateTime.now();
+		messageEntity.setSentDate(currentTime);
+		this.messageRepository.save(messageEntity);
 	}
 	
 	public IncomingGetResponse getIncomingMessages(String receiverName)
@@ -73,9 +75,35 @@ public class ChatServiceImpl implements ChatService {
 		return messageGetResponse;
 	}
 	
-	/*
-	 * TODO
-	 * - an endpoint to estimate the number of total messages that will be sent probably for the rest of the day 
-	 * - an endpoint to estimate the number of total messages that will be sent probably for the rest of the week
-	 */
+	public DayEstimationGetResponse getTotalMessagesToday() {
+		LocalDate currentDate = LocalDate.now();
+		LocalDateTime fromDate = LocalDateTime.of(currentDate, LocalTime.MIN);
+		LocalDateTime untilDate = LocalDateTime.of(currentDate, LocalTime.MAX);
+		List<MessageEntity> messageEntityList = this.messageRepository.findMessagesByDateBetween(fromDate, untilDate);
+
+		if(!messageEntityList.isEmpty()) {
+			Integer totalMessages = messageEntityList.size();
+			return DayEstimationGetResponse.builder()
+					.currentDate(currentDate.toString())
+					.totalMessages(totalMessages).build();
+		}
+		return null;
+	}
+	
+	public WeekEstimationGetResponse getTotalMessagesWeekly() {
+		LocalDate currentDate = LocalDate.now();
+		LocalDateTime fromDate = LocalDateTime.of(currentDate.minusDays(7), LocalTime.MIN);
+		LocalDateTime untilDate = LocalDateTime.of(currentDate, LocalTime.MAX);
+		List<MessageEntity> messageEntityList = this.messageRepository.findMessagesByDateBetween(fromDate, untilDate);
+
+		if(!messageEntityList.isEmpty()) {
+			Integer totalMessages = messageEntityList.size();
+			return WeekEstimationGetResponse.builder()
+					.fromDate(currentDate.minusDays(7).toString())
+					.untilDate(currentDate.toString())
+					.totalMessages(totalMessages)
+					.build();
+		}
+		return null;
+	}
 }

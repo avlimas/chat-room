@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import chat.room.request.MessagePostRequest;
+import chat.room.response.DayEstimationGetResponse;
 import chat.room.response.IncomingGetResponse;
 import chat.room.response.MessageGetResponse;
 import chat.room.response.OutcomingGetResponse;
+import chat.room.response.WeekEstimationGetResponse;
 import chat.room.service.ChatService;
 import lombok.RequiredArgsConstructor;
 
@@ -66,6 +68,30 @@ public class ChatController {
 		MessageGetResponse messageGetResponse = this.chatService.getMessageDetails(subject);
 		if (messageGetResponse != null) {
 	        return ResponseEntity.status(HttpStatus.OK).body(messageGetResponse);
+		}
+		else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+    }
+    
+    @GetMapping("/estimate-messages-today")
+    public ResponseEntity<DayEstimationGetResponse> getTotalMessagesDaily()
+    {
+    	DayEstimationGetResponse dayEstimationGetResponse = this.chatService.getTotalMessagesToday();
+		if (dayEstimationGetResponse != null) {
+	        return ResponseEntity.status(HttpStatus.OK).body(dayEstimationGetResponse);
+		}
+		else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+		}
+    }
+    
+    @GetMapping("/estimate-messages-weekly")
+    public ResponseEntity<WeekEstimationGetResponse> getTotalMessagesWeekly()
+    {
+    	WeekEstimationGetResponse weekEstimationGetResponse = this.chatService.getTotalMessagesWeekly();
+		if (weekEstimationGetResponse != null) {
+	        return ResponseEntity.status(HttpStatus.OK).body(weekEstimationGetResponse);
 		}
 		else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
