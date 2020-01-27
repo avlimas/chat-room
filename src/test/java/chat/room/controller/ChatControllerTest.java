@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +26,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import chat.room.request.MessagePostRequest;
+import chat.room.response.DayEstimationGetResponse;
 import chat.room.response.IncomingGetResponse;
 import chat.room.response.MessageGetResponse;
 import chat.room.response.OutcomingGetResponse;
+import chat.room.response.WeekEstimationGetResponse;
 import chat.room.response.object.IncomingMessage;
 import chat.room.response.object.OutcomingMessage;
 import chat.room.service.ChatService;
@@ -47,7 +50,76 @@ class ChatControllerTest {
     @Autowired
     @Qualifier("jacksonObjectMapper")
     private ObjectMapper objectMapper;
-
+    
+    @DisplayName("Test GET estimated total messages today")
+    @Test
+    void getTotalMessagesToday() throws Exception {
+    	// Given
+		String currentDate = LocalDate.now().toString();
+    	given(this.chatService.getTotalMessagesToday())
+    	.willReturn(DayEstimationGetResponse.builder().currentDate(currentDate).totalMessages(2).build());
+    	
+    	//When
+    	mockMvc.perform(get("/api/v1/chat/estimate-messages-today")
+    			.accept(MediaType.APPLICATION_JSON))
+    			.andExpect(status().isOk());
+    	
+    	//Then
+    	then(this.chatService).should().getTotalMessagesToday();
+    }
+    
+    @DisplayName("Test GET null estimated total messages today")
+    @Test
+    void getNullMessagesToday() throws Exception {
+    	// Given
+    	given(this.chatService.getTotalMessagesToday())
+    	.willReturn(null);
+    	
+    	//When
+    	mockMvc.perform(get("/api/v1/chat/estimate-messages-today")
+    			.accept(MediaType.APPLICATION_JSON))
+    			.andExpect(status().isNotFound());
+    	
+    	//Then
+    	then(this.chatService).should().getTotalMessagesToday();
+    }
+    
+    @DisplayName("Test GET estimated total messages weekly")
+    @Test
+    void getTotalMessagesWeekly() throws Exception {
+    	// Given
+    	LocalDate currentDate = LocalDate.now();
+    	given(this.chatService.getTotalMessagesWeekly())
+    	.willReturn(WeekEstimationGetResponse.builder()
+    			.fromDate(currentDate.minusDays(7).toString())
+    			.untilDate(currentDate.toString())
+    			.totalMessages(2).build());
+    	
+    	//When
+    	mockMvc.perform(get("/api/v1/chat/estimate-messages-weekly")
+    			.accept(MediaType.APPLICATION_JSON))
+    			.andExpect(status().isOk());
+    	
+    	//Then
+    	then(this.chatService).should().getTotalMessagesWeekly();
+    }
+    
+    @DisplayName("Test GET null estimated total messages weekly")
+    @Test
+    void getNullMessagesWeekly() throws Exception {
+    	// Given
+    	given(this.chatService.getTotalMessagesWeekly())
+    	.willReturn(null);
+    	
+    	//When
+    	mockMvc.perform(get("/api/v1/chat/estimate-messages-weekly")
+    			.accept(MediaType.APPLICATION_JSON))
+    			.andExpect(status().isNotFound());
+    	
+    	//Then
+    	then(this.chatService).should().getTotalMessagesWeekly();
+    }
+    
     @DisplayName("Test GET incoming messages of a user")
     @Test
     void getIncomingMessage() throws Exception {

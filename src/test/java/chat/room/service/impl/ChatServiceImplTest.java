@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeastOnce;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +30,11 @@ import chat.room.mapper.MessageMapper;
 import chat.room.model.MessageEntity;
 import chat.room.repository.MessageRepository;
 import chat.room.request.MessagePostRequest;
+import chat.room.response.DayEstimationGetResponse;
 import chat.room.response.IncomingGetResponse;
 import chat.room.response.MessageGetResponse;
 import chat.room.response.OutcomingGetResponse;
+import chat.room.response.WeekEstimationGetResponse;
 import chat.room.response.object.IncomingMessage;
 import chat.room.response.object.OutcomingMessage;
 
@@ -51,14 +54,99 @@ public class ChatServiceImplTest {
 
     @Captor
     ArgumentCaptor<String> stringArgumentCaptor;
-
+    
     @Captor
     ArgumentCaptor<MessageEntity> messageEntityCaptor;
+
+    @Captor
+    ArgumentCaptor<LocalDateTime> localDateTimeCaptor;
     
 	@BeforeEach
     void setUpForEach() {
 		chatServiceImpl = new ChatServiceImpl(messageRepository, messageMapper);
     }
+	
+	@DisplayName("Estimate Message Daily")
+	@Test
+	void testEstimateTotalMessagesDaily() {
+
+        //Given
+		String currentDate = LocalDate.now().toString();
+		List<MessageEntity> messageEntityList = getAllMessagesByAUser();
+		given(this.messageRepository.findMessagesByDateBetween(localDateTimeCaptor.capture(), localDateTimeCaptor.capture()))
+		.willReturn(messageEntityList);
+		
+		//When
+		DayEstimationGetResponse actualDayEstimationGetResponse = this.chatServiceImpl.getTotalMessagesToday();
+
+		//Then
+		DayEstimationGetResponse expectedDayEstimationGetResponse = DayEstimationGetResponse.builder()
+				.currentDate(currentDate).totalMessages(2)
+				.build();
+		then(this.messageRepository).should(atLeastOnce()).findMessagesByDateBetween(any(), any());
+		
+		assertEquals(expectedDayEstimationGetResponse, actualDayEstimationGetResponse);
+	}
+	
+	@DisplayName("Null Message Daily")
+	@Test
+	void testNullMessagesDaily() {
+
+        //Given
+		List<MessageEntity> messageEntityList = new ArrayList<>();
+		given(this.messageRepository.findMessagesByDateBetween(localDateTimeCaptor.capture(), localDateTimeCaptor.capture()))
+		.willReturn(messageEntityList);
+		
+		//When
+		DayEstimationGetResponse actualDayEstimationGetResponse = this.chatServiceImpl.getTotalMessagesToday();
+
+		//Then
+		DayEstimationGetResponse expectedDayEstimationGetResponse = null;
+		then(this.messageRepository).should(atLeastOnce()).findMessagesByDateBetween(any(), any());
+		
+		assertEquals(expectedDayEstimationGetResponse, actualDayEstimationGetResponse);
+	}
+	
+	@DisplayName("Estimate Message Weekly")
+	@Test
+	void testEstimateTotalMessagesWeekly() {
+
+        //Given
+		LocalDate currentDate = LocalDate.now();
+		List<MessageEntity> messageEntityList = getAllMessagesByAUser();
+		given(this.messageRepository.findMessagesByDateBetween(localDateTimeCaptor.capture(), localDateTimeCaptor.capture()))
+		.willReturn(messageEntityList);
+		
+		//When
+		WeekEstimationGetResponse actualWeekEstimationGetResponse = this.chatServiceImpl.getTotalMessagesWeekly();
+
+		//Then
+		WeekEstimationGetResponse expectedWeekEstimationGetResponse = WeekEstimationGetResponse.builder()
+				.fromDate(currentDate.minusDays(7).toString()).untilDate(currentDate.toString()).totalMessages(2)
+				.build();
+		then(this.messageRepository).should(atLeastOnce()).findMessagesByDateBetween(any(), any());
+
+		assertEquals(expectedWeekEstimationGetResponse, actualWeekEstimationGetResponse);
+	}
+	
+	@DisplayName("Null Message Weekly")
+	@Test
+	void testNullMessagesWeekly() {
+
+        //Given
+		List<MessageEntity> messageEntityList = new ArrayList<>();
+		given(this.messageRepository.findMessagesByDateBetween(localDateTimeCaptor.capture(), localDateTimeCaptor.capture()))
+		.willReturn(messageEntityList);
+		
+		//When
+		WeekEstimationGetResponse actualWeekEstimationGetResponse = this.chatServiceImpl.getTotalMessagesWeekly();
+
+		//Then
+		WeekEstimationGetResponse expectedWeekEstimationGetResponse = null;
+		then(this.messageRepository).should(atLeastOnce()).findMessagesByDateBetween(any(), any());
+
+		assertEquals(expectedWeekEstimationGetResponse, actualWeekEstimationGetResponse);
+	}
 	
 	@DisplayName("Send Message")
 	@Test
@@ -258,4 +346,5 @@ public class ChatServiceImplTest {
 		return MessagePostRequest.builder().sender("Germany").receiver("Belgium").subject("First message")
 				.content("Content of first message").build();
 	}
+	
 }
