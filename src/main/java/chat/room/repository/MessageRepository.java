@@ -17,6 +17,8 @@ public interface MessageRepository extends MongoRepository<MessageEntity, String
 	
 	Optional<MessageEntity> findBySubject(String messageSubject);
 	
+	Optional<MessageEntity> findBySubjectAndReceiverAndSender(String messageSubject, String receiver, String sender);
+	
 	@Query("{ 'sentDate' : { $gt: ?0, $lt: ?1 } }")
 	List<MessageEntity> findMessagesByDateBetween(LocalDateTime fromDate, LocalDateTime untilDate);
 }

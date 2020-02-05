@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +39,17 @@ public class ChatServiceImpl implements ChatService {
 		MessageEntity messageEntity = messageMapper.messagePostRequestToMessageEntity(messagePostRequest);
 		LocalDateTime currentTime = LocalDateTime.now();
 		messageEntity.setSentDate(currentTime);
-		this.messageRepository.save(messageEntity);
+		if (!findDuplicate(messageEntity)) {
+			this.messageRepository.save(messageEntity);	
+		}
+		else {
+			throw new DuplicateKeyException("Duplicate found!");
+		}
+	}
+	
+	private boolean findDuplicate(MessageEntity messageEntity) {
+		return this.messageRepository.findBySubjectAndReceiverAndSender(messageEntity.getSubject(), 
+				messageEntity.getReceiver(), messageEntity.getSender()).isPresent();
 	}
 	
 	public IncomingGetResponse getIncomingMessages(String receiverName)
